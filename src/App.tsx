@@ -255,7 +255,7 @@ export default function App() {
       <Toaster theme="dark" position="top-center" />
       
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 pt-5 sm:pt-6 pb-3 sm:pb-4 flex items-center justify-between gap-3 safe-top">
+      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-3.5 flex items-center justify-between gap-3 safe-top">
         <div
           className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
           onClick={() => setMode('library')}
@@ -303,7 +303,7 @@ export default function App() {
         )}
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 sm:pt-9 pb-24 sm:pb-30">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-24 sm:pb-30">
         <AnimatePresence mode="wait">
           {mode === 'library' ? (
             <motion.div 
@@ -313,13 +313,13 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="space-y-6"
             >
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Le mie schede</h2>
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-none">Le mie schede</h2>
                 <button 
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="primary-button p-2 rounded-xl touch-target"
+                  className="primary-button h-11 w-11 sm:h-12 sm:w-12 rounded-xl touch-target flex items-center justify-center"
                 >
-                  <Plus className="w-6 h-6" />
+                  <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
 
