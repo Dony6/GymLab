@@ -33,8 +33,10 @@ interface Exercise {
   id: string;
   name: string;
   sets: number;
+  kg: number;
   reps: string;
   restTime: number;
+  notes: string;
   completed: boolean;
   imageUrl?: string;
 }
@@ -66,8 +68,10 @@ function normalizeWorkouts(input: unknown): WorkoutPlan[] {
           id: String(exercise?.id ?? Math.random().toString(36).slice(2, 11)),
           name: String(exercise?.name ?? ''),
           sets: Number.isFinite(exercise?.sets) ? exercise.sets : 0,
+          kg: Number.isFinite(exercise?.kg) ? exercise.kg : 0,
           reps: String(exercise?.reps ?? ''),
           restTime: Number.isFinite(exercise?.restTime) ? exercise.restTime : 0,
+          notes: String(exercise?.notes ?? ''),
           completed: Boolean(exercise?.completed),
           imageUrl: sanitizeImageUrl(exercise?.imageUrl),
         }))
@@ -106,8 +110,10 @@ export default function App() {
           id: String(exercise?.id ?? Math.random().toString(36).slice(2, 11)),
           name: String(exercise?.name ?? ''),
           sets: Number.isFinite(exercise?.sets) ? exercise.sets : 0,
+          kg: Number.isFinite(exercise?.kg) ? exercise.kg : 0,
           reps: String(exercise?.reps ?? ''),
           restTime: Number.isFinite(exercise?.restTime) ? exercise.restTime : 0,
+          notes: String(exercise?.notes ?? ''),
           completed: Boolean(exercise?.completed),
           imageUrl: sanitizeImageUrl(exercise?.imageUrl),
         }));
@@ -203,8 +209,10 @@ export default function App() {
       id: Math.random().toString(36).substr(2, 9),
       name: '',
       sets: 3,
+      kg: 0,
       reps: '10',
       restTime: 60,
+      notes: '',
       completed: false
     };
     
@@ -437,9 +445,9 @@ export default function App() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Sets</label>
+                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Serie</label>
                           <input 
                             type="number"
                             value={ex.sets}
@@ -448,7 +456,16 @@ export default function App() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Reps</label>
+                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Kg</label>
+                          <input 
+                            type="number"
+                            value={ex.kg}
+                            onChange={(e) => updateExercise(ex.id, { kg: parseFloat(e.target.value) || 0 })}
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-green-500/50 outline-none transition-colors"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Ripetizioni</label>
                           <input 
                             type="text"
                             value={ex.reps}
@@ -457,7 +474,7 @@ export default function App() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Rest (s)</label>
+                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Recupero (s)</label>
                           <input 
                             type="number"
                             value={ex.restTime}
@@ -465,6 +482,17 @@ export default function App() {
                             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-green-500/50 outline-none transition-colors"
                           />
                         </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Note</label>
+                        <textarea
+                          placeholder="Note (opzionale)"
+                          value={ex.notes}
+                          onChange={(e) => updateExercise(ex.id, { notes: e.target.value })}
+                          rows={3}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-green-500/50 outline-none transition-all resize-none"
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -620,7 +648,7 @@ export default function App() {
                             <div>
                               <h3 className="font-bold leading-tight">{ex.name || 'Esercizio senza nome'}</h3>
                               <p className="text-[10px] muted-text font-bold uppercase tracking-widest mt-1">
-                                {ex.sets} Sets • {ex.reps} Reps
+                                {ex.sets} Serie • {ex.reps} Ripetizioni {ex.kg > 0 ? `• ${ex.kg} Kg` : ''}
                               </p>
                             </div>
                             {ex.completed && (
