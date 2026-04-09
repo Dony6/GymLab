@@ -11,7 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'apple-touch-icon-v2.png', 'masked-icon.svg'],
+        includeAssets: ['favicon.svg', 'apple-touch-icon-v3.png', 'masked-icon.svg'],
         manifest: {
           name: 'GymLab',
           short_name: 'GymLab',
@@ -23,12 +23,12 @@ export default defineConfig(() => {
           scope: '/',
           icons: [
             {
-              src: '/pwa-192-v2.png',
+              src: '/pwa-192-v3.png',
               sizes: '192x192',
               type: 'image/png',
             },
             {
-              src: '/pwa-512-v2.png',
+              src: '/pwa-512-v3.png',
               sizes: '512x512',
               type: 'image/png',
             },

@@ -215,13 +215,13 @@ export default function App() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3 safe-top">
         <div 
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-3 sm:gap-4 cursor-pointer"
           onClick={() => setMode('library')}
         >
           <img 
             src="/logo.png" 
             alt="GymLab" 
-            className="h-10 w-10 rounded-xl object-contain bg-white"
+            className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl object-contain bg-white p-1 shadow-md shadow-black/25 ring-1 ring-white/30"
             onError={(e) => {
               // Fallback if image is not uploaded yet
               e.currentTarget.style.display = 'none';
@@ -232,7 +232,7 @@ export default function App() {
           <div className="hidden w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-600/20">
             <FlaskConical className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-lg sm:text-xl font-extrabold tracking-tight uppercase">GYM<span className="text-green-500">LAB</span></h1>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight uppercase text-white">GYM<span className="text-green-500">LAB</span></h1>
         </div>
         
         {activeWorkoutId && (
