@@ -1,0 +1,14 @@
+OpenTraining exercise images used in this project.
+
+Source repository:
+https://github.com/chaosbastler/opentraining-exercises
+
+License (as declared in upstream README):
+Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+
+Author/source attribution (as declared upstream):
+Everkinetic (http://everkinetic.com/)
+
+Notes:
+- Files in this folder are copied locally to avoid external image URLs at runtime.
+- Keep this attribution file when redistributing these assets.

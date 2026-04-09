@@ -53,11 +53,66 @@ interface SessionRecord {
 
 type Mode = 'library' | 'editor' | 'training' | 'history' | 'complete';
 
+interface ExerciseCatalogItem {
+  name: string;
+  aliases: string[];
+  imageUrl: string;
+}
+
+interface ExerciseSuggestion {
+  name: string;
+  imageUrl: string;
+  source: 'catalogo';
+}
+
+const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
+  { name: 'Panca Piana', aliases: ['bench press', 'chest press'], imageUrl: '/exercises/Bench-press-1.png' },
+  { name: 'Panca Inclinata', aliases: ['incline bench press', 'incline chest press'], imageUrl: '/exercises/Bench-press-1.png' },
+  { name: 'Croci con Manubri', aliases: ['dumbbell fly', 'chest fly'], imageUrl: '/exercises/Dumbbell-flys-1.png' },
+  { name: 'Push Up', aliases: ['flessioni', 'pushups'], imageUrl: '/exercises/Bench-dips-1.png' },
+  { name: 'Squat', aliases: ['barbell squat', 'back squat'], imageUrl: '/exercises/Squats-1.png' },
+  { name: 'Affondi', aliases: ['lunges', 'dumbbell lunges'], imageUrl: '/exercises/Squats-1.png' },
+  { name: 'Stacco da Terra', aliases: ['deadlift', 'romanian deadlift'], imageUrl: '/exercises/Back-extension-on-stability-ball-1.png' },
+  { name: 'Leg Press', aliases: ['pressa', 'machine leg press'], imageUrl: '/exercises/Leg-press-1-1024x670.png' },
+  { name: 'Lat Machine', aliases: ['lat pulldown', 'pull down'], imageUrl: '/exercises/Gironda-sternum-chins-1.png' },
+  { name: 'Rematore Bilanciere', aliases: ['barbell row', 'bent over row'], imageUrl: '/exercises/Barbell-upright-rows-1.png' },
+  { name: 'Rematore Manubrio', aliases: ['dumbbell row', 'one arm row'], imageUrl: '/exercises/Arnold-press-1.png' },
+  { name: 'Trazioni', aliases: ['pull up', 'chin up'], imageUrl: '/exercises/Gironda-sternum-chins-1.png' },
+  { name: 'Shoulder Press', aliases: ['military press', 'overhead press'], imageUrl: '/exercises/Arnold-press-1.png' },
+  { name: 'Alzate Laterali', aliases: ['lateral raises', 'side raises'], imageUrl: '/exercises/Dumbbell-lateral-raises-1.png' },
+  { name: 'Curl Bilanciere', aliases: ['barbell curl', 'biceps curl'], imageUrl: '/exercises/Bicep-curls-1.png' },
+  { name: 'Curl Manubri', aliases: ['dumbbell curl', 'hammer curl'], imageUrl: '/exercises/Bicep-hammer-curl-1.png' },
+  { name: 'French Press', aliases: ['skull crusher', 'triceps extension'], imageUrl: '/exercises/Bench-dips-1.png' },
+  { name: 'Pushdown Cavi', aliases: ['triceps pushdown', 'cable pushdown'], imageUrl: '/exercises/Bench-dips-1.png' },
+  { name: 'Crunch Addominali', aliases: ['crunch', 'sit up'], imageUrl: '/exercises/Crunches-1.png' },
+  { name: 'Plank', aliases: ['core plank', 'front plank'], imageUrl: '/exercises/Decline-crunch-1.png' },
+];
+
+function getExerciseSuggestions(query: string): ExerciseCatalogItem[] {
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return [];
+  return EXERCISE_CATALOG.filter(item =>
+    item.name.toLowerCase().includes(q) || item.aliases.some(alias => alias.toLowerCase().includes(q))
+  ).slice(0, 6);
+}
+
+function getExactCatalogExercise(query: string): ExerciseCatalogItem | null {
+  const q = query.trim().toLowerCase();
+  if (!q) return null;
+  return EXERCISE_CATALOG.find(item =>
+    item.name.toLowerCase() === q || item.aliases.some(alias => alias.toLowerCase() === q)
+  ) || null;
+}
+
 function sanitizeImageUrl(rawUrl?: string): string {
   if (!rawUrl) return '';
   const v = rawUrl.trim();
-  if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('data:image/')) return v;
+  if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('data:image/') || v.startsWith('/')) return v;
   return '';
+}
+
+function isLocalExerciseAsset(url?: string): boolean {
+  return Boolean(url && url.startsWith('/exercises/'));
 }
 
 function normalizeExercise(ex: any): Exercise {
@@ -147,10 +202,12 @@ export default function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newWorkoutName, setNewWorkoutName] = useState('');
   const [workoutToDelete, setWorkoutToDelete] = useState<string | null>(null);
+  const [exerciseToDelete, setExerciseToDelete] = useState<{ id: string; name: string } | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; name: string } | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [sessionElapsed, setSessionElapsed] = useState(0);
   const [completedSession, setCompletedSession] = useState<SessionRecord | null>(null);
+  const [activeExerciseSearchId, setActiveExerciseSearchId] = useState<string | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -276,9 +333,22 @@ export default function App() {
 
   const removeExercise = (id: string) => {
     if (!activeWorkoutId) return;
+    const ex = exercises.find((item) => item.id === id);
+    if (!ex) return;
+    setExerciseToDelete({ id: ex.id, name: ex.name || 'Esercizio senza nome' });
+  };
+
+  const confirmDeleteExercise = () => {
+    if (!activeWorkoutId || !exerciseToDelete) return;
+    const deletingId = exerciseToDelete.id;
     setWorkouts(prev => prev.map(w =>
-      w.id === activeWorkoutId ? { ...w, exercises: w.exercises.filter(ex => ex.id !== id) } : w
+      w.id === activeWorkoutId ? { ...w, exercises: w.exercises.filter(ex => ex.id !== deletingId) } : w
     ));
+    if (activeTimer?.id === deletingId) {
+      setActiveTimer(null);
+    }
+    toast.success('Esercizio eliminato');
+    setExerciseToDelete(null);
   };
 
   const toggleSet = (exerciseId: string, setIndex: number) => {
@@ -399,7 +469,11 @@ export default function App() {
         </header>
       )}
 
-      <main className={cn('max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-32', mode === 'complete' && 'pt-0 pb-0')}>
+      <main className={cn(
+        'mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-32',
+        mode === 'training' || mode === 'editor' ? 'max-w-5xl' : 'max-w-3xl',
+        mode === 'complete' && 'pt-0 pb-0'
+      )}>
         <AnimatePresence mode="wait">
 
           {/* LIBRARY */}
@@ -521,14 +595,71 @@ export default function App() {
                   const originalIndex = exercises.findIndex(e => e.id === ex.id);
                   return (
                     <div key={ex.id} className="glass-card p-4 sm:p-5 rounded-2xl space-y-4 relative group">
-                      <button onClick={() => removeExercise(ex.id)} className="absolute top-4 right-4 text-white/20 hover:text-red-500 transition-colors">
+                      <button onClick={() => removeExercise(ex.id)} className="absolute top-4 right-4 text-white/20 hover:text-red-500 transition-colors p-1 rounded-lg touch-target" title="Elimina esercizio">
                         <Trash2 className="w-5 h-5" />
                       </button>
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-green-500 font-mono text-sm">#{originalIndex + 1}</span>
-                        <input type="text" placeholder="Nome esercizio (es. Panca Piana)" value={ex.name}
-                          onChange={e => updateExercise(ex.id, { name: e.target.value })}
-                          className="bg-transparent border-none text-lg font-bold focus:ring-0 p-0 w-full placeholder:text-white/20" />
+                        <div className="relative w-full">
+                          <input
+                            type="text"
+                            placeholder="Nome esercizio (es. Panca Piana)"
+                            value={ex.name}
+                            onFocus={() => setActiveExerciseSearchId(ex.id)}
+                            onBlur={() => setTimeout(() => setActiveExerciseSearchId(prev => (prev === ex.id ? null : prev)), 120)}
+                            onChange={e => {
+                              const value = e.target.value;
+                              updateExercise(ex.id, { name: value });
+                              const exactMatch = getExactCatalogExercise(value);
+                              if (exactMatch) {
+                                updateExercise(ex.id, { name: exactMatch.name, imageUrl: exactMatch.imageUrl });
+                              }
+                            }}
+                            className="bg-transparent border-none text-lg font-bold focus:ring-0 p-0 w-full placeholder:text-white/20"
+                          />
+
+                          {activeExerciseSearchId === ex.id && (() => {
+                            const localSuggestions: ExerciseSuggestion[] = getExerciseSuggestions(ex.name).map(item => ({
+                              name: item.name,
+                              imageUrl: item.imageUrl,
+                              source: 'catalogo' as const,
+                            }));
+                            const suggestions = localSuggestions.slice(0, 8);
+                            return suggestions.length > 0 ? (
+                            <div className="absolute z-30 left-0 right-0 top-[calc(100%+0.5rem)] glass-card rounded-xl overflow-hidden border border-white/15">
+                              {suggestions.map(item => (
+                                <button
+                                  key={item.name}
+                                  type="button"
+                                  onMouseDown={(ev) => ev.preventDefault()}
+                                  onClick={() => {
+                                    updateExercise(ex.id, { name: item.name, imageUrl: item.imageUrl });
+                                    setActiveExerciseSearchId(null);
+                                  }}
+                                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
+                                >
+                                  <img
+                                    src={item.imageUrl}
+                                    alt={item.name}
+                                    className={cn(
+                                      'w-10 h-10 rounded-lg border border-white/10',
+                                      isLocalExerciseAsset(item.imageUrl)
+                                        ? 'object-contain p-1 bg-white/90'
+                                        : 'object-cover'
+                                    )}
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-semibold truncate">{item.name}</p>
+                                    <p className="text-[10px] uppercase tracking-wider text-white/40">
+                                      Da catalogo locale
+                                    </p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                            ) : null;
+                          })()}
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                         {([
@@ -556,7 +687,7 @@ export default function App() {
                         <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Immagine Esercizio</label>
                         <div className="relative">
                           <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                          <input type="text" placeholder="URL immagine (opzionale)" value={ex.imageUrl || ''}
+                          <input type="text" placeholder="URL immagine personalizzato (solo esercizi custom)" value={ex.imageUrl || ''}
                             onChange={e => {
                               const sanitized = sanitizeImageUrl(e.target.value);
                               if (e.target.value && !sanitized) { toast.error('URL non valido.'); return; }
@@ -566,12 +697,32 @@ export default function App() {
                         </div>
                         {ex.imageUrl && (
                           <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-white/10 mt-2 group/img">
-                            <img src={ex.imageUrl} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            <img
+                              src={ex.imageUrl}
+                              alt="Preview"
+                              className={cn(
+                                'w-full h-full',
+                                isLocalExerciseAsset(ex.imageUrl)
+                                  ? 'object-contain p-1.5 bg-white/90'
+                                  : 'object-cover'
+                              )}
+                              referrerPolicy="no-referrer"
+                            />
                             <button onClick={() => updateExercise(ex.id, { imageUrl: '' })} className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                               <X className="w-4 h-4 text-white" />
                             </button>
                           </div>
                         )}
+                      </div>
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => removeExercise(ex.id)}
+                          className="w-full py-2.5 rounded-xl border border-red-500/35 bg-red-500/10 text-red-300 hover:text-red-200 hover:bg-red-500/15 transition-all font-semibold text-sm flex items-center justify-center gap-2 touch-target"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Elimina esercizio
+                        </button>
                       </div>
                     </div>
                   );
@@ -657,10 +808,20 @@ export default function App() {
                     return (
                       <motion.div key={ex.id} layout className={cn('glass-card rounded-2xl overflow-hidden transition-all duration-300', exDone && 'opacity-60')}>
                         <div className="flex">
-                          <div className="w-20 sm:w-24 flex-shrink-0 bg-white/5 relative cursor-zoom-in group/thumb self-stretch"
+                          <div className="w-28 sm:w-32 flex-shrink-0 bg-white/5 relative cursor-zoom-in group/thumb self-stretch"
                             onClick={() => ex.imageUrl && setPreviewImage({ url: ex.imageUrl, name: ex.name })}>
                             {ex.imageUrl ? (
-                              <img src={ex.imageUrl} alt={ex.name} className="w-full h-full object-cover transition-transform group-hover/thumb:scale-110 absolute inset-0" referrerPolicy="no-referrer" />
+                              <img
+                                src={ex.imageUrl}
+                                alt={ex.name}
+                                className={cn(
+                                  'w-full h-full transition-transform group-hover/thumb:scale-110 absolute inset-0',
+                                  isLocalExerciseAsset(ex.imageUrl)
+                                    ? 'object-contain p-1.5 bg-white/90'
+                                    : 'object-cover'
+                                )}
+                                referrerPolicy="no-referrer"
+                              />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-white/5 min-h-[5.5rem]">
                                 <Dumbbell className="w-8 h-8 text-white/10" />
@@ -680,15 +841,28 @@ export default function App() {
                             )}
                           </div>
 
-                          <div className="flex-1 p-3 sm:p-4 flex flex-col gap-2.5">
-                            <div>
-                              <h3 className="font-bold leading-tight">{ex.name || 'Esercizio senza nome'}</h3>
-                              <p className="text-[10px] muted-text font-bold uppercase tracking-widest mt-0.5">
-                                {ex.reps} rip{ex.kg > 0 ? ` · ${ex.kg} kg` : ''}{ex.restTime > 0 ? ` · ${ex.restTime}s rec.` : ''}
-                              </p>
+                          <div className="flex-1 p-3.5 sm:p-4 flex flex-col gap-3 min-w-0">
+                            <div className="w-full">
+                              <h3 className="font-extrabold text-lg leading-tight truncate">{ex.name || 'Esercizio senza nome'}</h3>
+                              <div className="mt-1.5 flex items-center gap-2 flex-wrap text-[10px] uppercase tracking-widest">
+                                <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/70 font-bold">
+                                  {ex.reps} rip
+                                </span>
+                                {ex.kg > 0 && (
+                                  <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/70 font-bold">
+                                    {ex.kg} kg
+                                  </span>
+                                )}
+                                {ex.restTime > 0 && (
+                                  <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10 text-white/70 font-bold">
+                                    {ex.restTime}s rec.
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="w-full flex items-center justify-between gap-3 flex-wrap">
+                              <div className="flex items-center gap-2 flex-wrap">
                               {Array.from({ length: ex.sets }).map((_, i) => (
                                 <button key={i} onClick={() => toggleSet(ex.id, i)}
                                   className={cn(
@@ -700,7 +874,8 @@ export default function App() {
                                   {ex.completedSets[i] ? <CheckCircle2 className="w-4 h-4" /> : <span>{i + 1}</span>}
                                 </button>
                               ))}
-                              <span className="text-[10px] muted-text ml-1">
+                              </div>
+                              <span className="text-xs muted-text font-semibold tabular-nums">
                                 {ex.completedSets.filter(Boolean).length}/{ex.sets}
                               </span>
                             </div>
@@ -884,11 +1059,35 @@ export default function App() {
           </div>
         )}
 
+        {exerciseToDelete && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="glass-card p-6 rounded-3xl w-full max-w-sm space-y-4 shadow-2xl compact-landscape">
+              <h3 className="text-xl font-bold">Elimina Esercizio</h3>
+              <p className="muted-text">Vuoi eliminare <span className="text-white font-semibold">"{exerciseToDelete.name}"</span> da questa scheda?</p>
+              <div className="flex gap-3">
+                <button onClick={() => setExerciseToDelete(null)} className="flex-1 py-3 soft-button rounded-xl font-bold transition-all touch-target">Annulla</button>
+                <button onClick={confirmDeleteExercise} className="flex-1 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-bold transition-all touch-target">Elimina</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {previewImage && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl cursor-zoom-out" onClick={() => setPreviewImage(null)}>
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className="relative max-w-lg w-full aspect-square rounded-3xl overflow-hidden shadow-2xl border border-white/10" onClick={e => e.stopPropagation()}>
-              <img src={previewImage.url} alt={previewImage.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              <img
+                src={previewImage.url}
+                alt={previewImage.name}
+                className={cn(
+                  'w-full h-full',
+                  isLocalExerciseAsset(previewImage.url)
+                    ? 'object-contain p-4 bg-white'
+                    : 'object-cover'
+                )}
+                referrerPolicy="no-referrer"
+              />
               <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
                 <h3 className="text-2xl font-bold text-white">{previewImage.name}</h3>
               </div>
