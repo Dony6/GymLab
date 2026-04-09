@@ -255,12 +255,12 @@ export default function App() {
       <Toaster theme="dark" position="top-center" />
       
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3 safe-top">
+      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 pt-5 sm:pt-6 pb-3 sm:pb-4 flex items-center justify-between gap-3 safe-top">
         <div
-          className="flex items-center gap-3 sm:gap-4 cursor-pointer select-none"
+          className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
           onClick={() => setMode('library')}
         >
-          <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl bg-[#0d1512] ring-1 ring-white/15 p-0.5 flex items-center justify-center overflow-hidden">
+          <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-[#0b1310] ring-1 ring-white/10 p-1 flex items-center justify-center overflow-hidden shadow-[0_0_0_1px_rgba(34,197,94,0.12)]">
             <img
               src="/logo.png"
               alt="GymLab"
@@ -276,7 +276,7 @@ export default function App() {
           <div className="hidden w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-600/20">
             <FlaskConical className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-xl sm:text-2xl leading-none font-black tracking-tight uppercase text-white">GYM<span className="text-green-500">LAB</span></h1>
+          <h1 className="text-[1.05rem] sm:text-[1.15rem] leading-none font-extrabold tracking-[0.02em] uppercase text-white">GYM<span className="text-green-500">LAB</span></h1>
         </div>
         
         {activeWorkoutId && (
@@ -303,7 +303,7 @@ export default function App() {
         )}
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28 sm:pb-32">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-7 sm:pt-9 pb-24 sm:pb-30">
         <AnimatePresence mode="wait">
           {mode === 'library' ? (
             <motion.div 
