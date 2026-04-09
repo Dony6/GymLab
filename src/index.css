@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --bg-main: #070b0a;
+  --bg-surface: #0f1715;
+  --bg-surface-2: #131e1b;
+  --border-soft: rgba(255, 255, 255, 0.12);
+  --text-primary: #f3f7f6;
+  --text-secondary: #9fb0ab;
+  --accent: #22c55e;
+  --accent-strong: #16a34a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 10% 5%, rgba(34, 197, 94, 0.1), transparent 30%),
+    radial-gradient(circle at 90% 0%, rgba(16, 185, 129, 0.07), transparent 35%),
+    var(--bg-main);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.glass-card {
+  background: linear-gradient(180deg, rgba(20, 30, 28, 0.82), rgba(12, 19, 17, 0.85));
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card:hover {
+  border-color: rgba(34, 197, 94, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(34, 197, 94, 0.16) inset;
+}
+
+.primary-button {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color: white;
+  transition: transform 120ms ease, filter 200ms ease, box-shadow 200ms ease;
+  box-shadow: 0 10px 20px rgba(22, 163, 74, 0.28);
+}
+
+.primary-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.soft-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.soft-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.muted-text {
+  color: var(--text-secondary);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .glass-card:hover {
+    border-color: var(--border-soft);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  }
+
+  .primary-button:hover {
+    filter: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .compact-landscape {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}

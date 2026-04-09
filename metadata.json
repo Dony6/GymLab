@@ -1,0 +1,5 @@
+{
+  "name": "GymLab",
+  "description": "Gestore di schede d'allenamento professionale. Crea, personalizza e avvia le tue sessioni con timer integrati.",
+  "requestFramePermissions": []
+}
