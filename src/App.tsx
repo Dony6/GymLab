@@ -263,7 +263,7 @@ export default function App() {
           <img 
             src="/logo.png" 
             alt="GymLab" 
-            className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl object-cover shadow-md shadow-black/25 ring-1 ring-white/20"
+            className="h-11 w-11 sm:h-12 sm:w-12 rounded-lg object-contain"
             onError={(e) => {
               // Fallback if image is not uploaded yet
               e.currentTarget.style.display = 'none';
