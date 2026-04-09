@@ -47,6 +47,34 @@ interface WorkoutPlan {
 
 type Mode = 'library' | 'editor' | 'training';
 
+function sanitizeImageUrl(rawUrl?: string): string {
+  if (!rawUrl) return '';
+  const value = rawUrl.trim();
+  if (!value) return '';
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  if (value.startsWith('data:image/')) return value;
+  return '';
+}
+
+function normalizeWorkouts(input: unknown): WorkoutPlan[] {
+  if (!Array.isArray(input)) return [];
+  return input.map((workout: any) => ({
+    id: String(workout?.id ?? Math.random().toString(36).slice(2, 11)),
+    name: String(workout?.name ?? 'Scheda'),
+    exercises: Array.isArray(workout?.exercises)
+      ? workout.exercises.map((exercise: any) => ({
+          id: String(exercise?.id ?? Math.random().toString(36).slice(2, 11)),
+          name: String(exercise?.name ?? ''),
+          sets: Number.isFinite(exercise?.sets) ? exercise.sets : 0,
+          reps: String(exercise?.reps ?? ''),
+          restTime: Number.isFinite(exercise?.restTime) ? exercise.restTime : 0,
+          completed: Boolean(exercise?.completed),
+          imageUrl: sanitizeImageUrl(exercise?.imageUrl),
+        }))
+      : [],
+  }));
+}
+
 export default function App() {
   const [mode, setMode] = useState<Mode>('library');
   const [workouts, setWorkouts] = useState<WorkoutPlan[]>([]);
@@ -64,23 +92,37 @@ export default function App() {
 
   // Load from LocalStorage and Migrate
   useEffect(() => {
-    const saved = localStorage.getItem('gymlab-workouts');
-    const oldSaved = localStorage.getItem('iron-track-workout');
+    try {
+      const saved = localStorage.getItem('gymlab-workouts');
+      const oldSaved = localStorage.getItem('iron-track-workout');
 
-    if (saved) {
-      setWorkouts(JSON.parse(saved));
-    } else if (oldSaved) {
-      // Migrate old data
-      const oldExercises = JSON.parse(oldSaved);
-      const migratedWorkout: WorkoutPlan = {
-        id: 'migrated-1',
-        name: 'Scheda Importata',
-        exercises: oldExercises
-      };
-      setWorkouts([migratedWorkout]);
-      localStorage.setItem('gymlab-workouts', JSON.stringify([migratedWorkout]));
-      // Don't remove old key yet just to be safe, but we could:
-      // localStorage.removeItem('iron-track-workout');
+      if (saved) {
+        setWorkouts(normalizeWorkouts(JSON.parse(saved)));
+      } else if (oldSaved) {
+        // Migrate old data
+        const parsedOld = JSON.parse(oldSaved);
+        const oldExercises = Array.isArray(parsedOld) ? parsedOld : [];
+        const migratedExercises = oldExercises.map((exercise: any) => ({
+          id: String(exercise?.id ?? Math.random().toString(36).slice(2, 11)),
+          name: String(exercise?.name ?? ''),
+          sets: Number.isFinite(exercise?.sets) ? exercise.sets : 0,
+          reps: String(exercise?.reps ?? ''),
+          restTime: Number.isFinite(exercise?.restTime) ? exercise.restTime : 0,
+          completed: Boolean(exercise?.completed),
+          imageUrl: sanitizeImageUrl(exercise?.imageUrl),
+        }));
+        const migratedWorkout: WorkoutPlan = {
+          id: 'migrated-1',
+          name: 'Scheda Importata',
+          exercises: migratedExercises,
+        };
+        setWorkouts([migratedWorkout]);
+        localStorage.setItem('gymlab-workouts', JSON.stringify([migratedWorkout]));
+      }
+    } catch (error) {
+      console.error('Local storage parse failed:', error);
+      toast.error('Dati locali corrotti: inizializzazione pulita.');
+      setWorkouts([]);
     }
   }, []);
 
@@ -431,7 +473,15 @@ export default function App() {
                             type="text"
                             placeholder="URL Immagine (opzionale)"
                             value={ex.imageUrl || ''}
-                            onChange={(e) => updateExercise(ex.id, { imageUrl: e.target.value })}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const sanitized = sanitizeImageUrl(value);
+                              if (value && !sanitized) {
+                                toast.error('URL immagine non valido. Usa solo http(s) o data:image.');
+                                return;
+                              }
+                              updateExercise(ex.id, { imageUrl: sanitized });
+                            }}
                             className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-green-500/50 outline-none transition-all"
                           />
                         </div>
