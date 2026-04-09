@@ -288,7 +288,7 @@ export default function App() {
                 mode === 'training' ? "bg-white/12 text-white shadow-sm" : "text-white/50 hover:text-white/80"
               )}
             >
-              Training
+              Allenamento
             </button>
             <button 
               onClick={() => setMode('editor')}
@@ -297,7 +297,7 @@ export default function App() {
                 mode === 'editor' ? "bg-white/12 text-white shadow-sm" : "text-white/50 hover:text-white/80"
               )}
             >
-              Editor
+              Modifica
             </button>
           </div>
         )}
@@ -390,7 +390,7 @@ export default function App() {
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{activeWorkout?.name} <span className="text-white/30 text-xs sm:text-sm font-normal ml-2">Editor</span></h2>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{activeWorkout?.name} <span className="text-white/30 text-xs sm:text-sm font-normal ml-2">Modifica</span></h2>
                 </div>
 
                 {/* Search Bar */}
@@ -398,7 +398,7 @@ export default function App() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                   <input 
                     type="text"
-                    placeholder="Search exercises..."
+                    placeholder="Cerca esercizi..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-11 py-3 text-sm focus:border-green-500/60 outline-none transition-all"
@@ -430,7 +430,7 @@ export default function App() {
                         <span className="text-green-500 font-mono text-sm">#{originalIndex + 1}</span>
                         <input 
                           type="text"
-                          placeholder="Exercise Name (e.g. Bench Press)"
+                          placeholder="Nome esercizio (es. Panca Piana)"
                           value={ex.name}
                           onChange={(e) => updateExercise(ex.id, { name: e.target.value })}
                           className="bg-transparent border-none text-lg font-bold focus:ring-0 p-0 w-full placeholder:text-white/20"
@@ -473,7 +473,7 @@ export default function App() {
                           <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                           <input 
                             type="text"
-                            placeholder="URL Immagine (opzionale)"
+                            placeholder="URL immagine (opzionale)"
                             value={ex.imageUrl || ''}
                             onChange={(e) => {
                               const value = e.target.value;
@@ -509,18 +509,18 @@ export default function App() {
                 className="w-full py-4 border-2 border-dashed border-white/20 rounded-2xl flex items-center justify-center gap-2 text-white/60 hover:text-white hover:border-green-500/40 transition-all"
               >
                 <Plus className="w-5 h-5" />
-                Add Exercise
+                Aggiungi Esercizio
               </button>
 
               <button 
                 onClick={() => {
                   setMode('training');
-                  toast.success('Workout saved!');
+                  toast.success('Scheda salvata!');
                 }}
                 className="w-full py-4 primary-button rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2"
               >
                 <Save className="w-5 h-5" />
-                Save Workout
+                Salva Scheda
               </button>
             </motion.div>
           ) : (
@@ -557,12 +557,12 @@ export default function App() {
                   <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto">
                     <Dumbbell className="w-8 h-8 text-white/20" />
                   </div>
-                  <p className="text-white/40">No exercises added yet. Go to Editor to start.</p>
+                  <p className="text-white/40">Nessun esercizio aggiunto. Vai in Modifica per iniziare.</p>
                   <button 
                     onClick={() => setMode('editor')}
                     className="text-green-500 font-bold hover:underline"
                   >
-                    Open Editor
+                    Apri Modifica
                   </button>
                 </div>
               ) : (
@@ -610,7 +610,7 @@ export default function App() {
                               >
                                 {activeTimer.timeLeft}
                               </motion.span>
-                              <span className="text-[8px] uppercase font-bold tracking-tighter text-white/80">Resting</span>
+                              <span className="text-[8px] uppercase font-bold tracking-tighter text-white/80">Recupero</span>
                             </motion.div>
                           )}
                         </div>
@@ -618,13 +618,13 @@ export default function App() {
                         <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h3 className="font-bold leading-tight">{ex.name || 'Unnamed Exercise'}</h3>
+                              <h3 className="font-bold leading-tight">{ex.name || 'Esercizio senza nome'}</h3>
                               <p className="text-[10px] muted-text font-bold uppercase tracking-widest mt-1">
                                 {ex.sets} Sets • {ex.reps} Reps
                               </p>
                             </div>
                             {ex.completed && (
-                              <span className="text-[10px] uppercase tracking-widest font-bold text-green-400 mr-2">Done</span>
+                              <span className="text-[10px] uppercase tracking-widest font-bold text-green-400 mr-2">Fatto</span>
                             )}
                             <button 
                               onClick={() => toggleComplete(ex.id)}
@@ -649,7 +649,7 @@ export default function App() {
                               )}
                             >
                               <Timer className="w-3 h-3" />
-                              {activeTimer?.id === ex.id ? `${activeTimer.timeLeft}s` : 'Start Rest'}
+                              {activeTimer?.id === ex.id ? `${activeTimer.timeLeft}s` : 'Avvia Recupero'}
                             </button>
                           </div>
                         </div>
@@ -671,15 +671,15 @@ export default function App() {
               onClick={() => {
                 const next = exercises.find(e => !e.completed);
                 if (next) {
-                  toast.info(`Next up: ${next.name}`);
+                  toast.info(`Prossimo: ${next.name}`);
                 } else {
-                  toast.success('Workout Complete! Great job!');
+                  toast.success('Allenamento completato! Ottimo lavoro!');
                 }
               }}
               className="w-full py-3.5 sm:py-4 primary-button rounded-2xl font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 touch-target"
             >
               <Play className="w-5 h-5 fill-current" />
-              Continue Session
+              Continua Sessione
             </button>
           </div>
         </div>
@@ -770,7 +770,7 @@ export default function App() {
               />
               <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
                 <h3 className="text-2xl font-bold text-white">{previewImage.name}</h3>
-                <p className="text-white/60 text-sm uppercase tracking-widest font-bold mt-1">GymLab Exercise Preview</p>
+                <p className="text-white/60 text-sm uppercase tracking-widest font-bold mt-1">Anteprima Esercizio GymLab</p>
               </div>
               <button 
                 onClick={() => setPreviewImage(null)}
