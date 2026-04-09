@@ -255,9 +255,9 @@ export default function App() {
       <Toaster theme="dark" position="top-center" />
       
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-3.5 flex items-center justify-between gap-3 safe-top">
+      <header className="sticky top-0 z-50 bg-[#070b0a]/75 backdrop-blur-xl border-b border-white/10 px-5 sm:px-7 pt-5 sm:pt-6 pb-3 sm:pb-3.5 flex items-center justify-between gap-3 safe-top">
         <div
-          className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
+          className="mt-1 sm:mt-1.5 flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none"
           onClick={() => setMode('library')}
         >
           <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-[#0b1310] ring-1 ring-white/10 p-1 flex items-center justify-center overflow-hidden shadow-[0_0_0_1px_rgba(34,197,94,0.12)]">
